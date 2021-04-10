@@ -1,6 +1,7 @@
 namespace SpriteKind {
     export const back = SpriteKind.create()
     export const Blower = SpriteKind.create()
+    export const Projectle2 = SpriteKind.create()
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     timer.throttle("action", 5000, function () {
@@ -25,6 +26,11 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         projectile.z = -3
         projectile.startEffect(effects.bubbles, 5000)
     })
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectle2, function (sprite, otherSprite) {
+    otherSprite.destroy()
+    info.changeLifeBy(-1)
+    scene.cameraShake(4, 500)
 })
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     Blower2 = sprites.create(img`
@@ -58,6 +64,8 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, oth
     otherSprite.destroy()
     info.changeScoreBy(1)
 })
+let projectile2: Sprite = null
+let en: Sprite[] = []
 let SeaEnemy: Sprite = null
 let Blower2: Sprite = null
 let projectile: Sprite = null
@@ -263,10 +271,31 @@ mySprite.setStayInScreen(true)
 mySprite.setPosition(80, 110)
 mySprite.z = -2
 game.onUpdateInterval(1000, function () {
-    if (Math.percentChance(10)) {
+    if (Math.percentChance(20)) {
         SeaEnemy = sprites.create(EnemySheeps[randint(0, EnemySheeps.length - 1)], SpriteKind.Enemy)
         SeaEnemy.setPosition(160, randint(20, 90))
-        SeaEnemy.setVelocity(randint(-5, -15), 0)
+        SeaEnemy.setVelocity(randint(-5, -25), 0)
         SeaEnemy.z = -2
+        mySprite.setFlag(SpriteFlag.AutoDestroy, true)
+    }
+    if (Math.percentChance(50)) {
+        en = sprites.allOfKind(SpriteKind.Enemy)
+        projectile2 = sprites.createProjectileFromSprite(img`
+            f f f 
+            . f . 
+            f f f 
+            f f f 
+            f f f 
+            f f f 
+            f f f 
+            f f f 
+            f f f 
+            f f f 
+            f f f 
+            . f . 
+            `, en[randint(0, en.length - 1)], 0, 20)
+        projectile2.startEffect(effects.bubbles)
+        projectile2.setFlag(SpriteFlag.AutoDestroy, true)
+        projectile2.setKind(SpriteKind.Projectle2)
     }
 })
